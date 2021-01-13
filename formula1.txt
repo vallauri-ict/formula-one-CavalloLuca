@@ -1,0 +1,4 @@
+TABELLE: 
+-driver=>
+-team=>logo grande,logo piccolo, country
+-country=>

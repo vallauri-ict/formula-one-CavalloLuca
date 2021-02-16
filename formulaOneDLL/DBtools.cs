@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using System.IO;
 using System.Data;
-
+using System.Security.Cryptography;
+using System.Drawing;
 
 namespace FormulaOneDLL
 {
@@ -16,7 +17,9 @@ namespace FormulaOneDLL
 
         public const string QUERYPATH = @"C:\data\formulaone\";
         public const string DBPATH = @"C:\data\formulaone\";
-        public const string CONNECTION_STRING = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename="+ DBPATH + "FormulaOne.mdf;Integrated Security=True";
+        public const string CONNECTION_STRING = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename="+ DBPATH + "formulaone.mdf;Integrated Security=True";
+
+
         private DataTable dataTable = new DataTable();
 
         public List<string> GetCountries()
@@ -27,7 +30,7 @@ namespace FormulaOneDLL
                 dbConn.ConnectionString = CONNECTION_STRING;
                 Console.WriteLine("\nQuery data example: ");
                 Console.WriteLine("\n=========================================\n");
-                String sql = "SELECT * FROM country";
+                String sql = "SELECT * FROM Country";
                 using (SqlCommand command = new SqlCommand(sql, dbConn))
                 {
                     dbConn.Open();
@@ -37,8 +40,210 @@ namespace FormulaOneDLL
                         {
                             string IsoCode = reader.GetString(0);
                             string descr = reader.GetString(1);
-                            Console.WriteLine("{0} {1} ", IsoCode, descr);
                             retVal.Add(IsoCode + " - " + descr);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public List<string> GetDrivers()
+        {
+            List<string> retVal = new List<string>();
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                Console.WriteLine("\nQuery data example: ");
+                Console.WriteLine("\n=========================================\n");
+                String sql = "SELECT * FROM Driver";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+                            int number = reader.GetInt32(1);
+                            string name = reader.GetString(2);
+                            retVal.Add(id + " - " + number + " - " + name);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public List<Country> GetCountriesObj()
+        {
+            List<Country> retVal = new List<Country>();
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Country";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string IsoCode = reader.GetString(0);
+                            string descr = reader.GetString(1);
+                            retVal.Add(new Country(IsoCode,descr));
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public List<Driver> GetDriversObj()
+        {
+            List<Driver> retVal = new List<Driver>();
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Driver";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+                            int number = reader.GetInt32(1);
+                            string name = reader.GetString(2);
+                            DateTime dob = reader.GetDateTime(3);
+                            byte[] helmetImage = reader["HelmetImage"] as byte[];
+                            byte[] image = reader["Image"] as byte[];
+                            int teamId = reader.GetInt32(6);
+                            int podius = reader.GetInt32(7);
+                            retVal.Add(new Driver(id, number, name, dob, helmetImage, image, teamId, podius));
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public List<Team> GetTeamsObj()
+        {
+            List<Team> retVal = new List<Team>();
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Team";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int idTeam = reader.GetInt32(0);
+                            string teamname = reader.GetString(1);
+                            byte[] teamlogo = reader["TeamLogo"] as byte[];
+                            string _base = reader.GetString(3);
+                            string teamchief = reader.GetString(4);
+                            string technicalchief = reader.GetString(5);
+                            string powerunit = reader.GetString(6);
+                            byte[] carimage = reader["CarImage"] as byte[];
+                            string countryid = reader.GetString(8);
+                            int worldchampionships = reader.GetInt32(9);
+                            int polepositions = reader.GetInt32(10);
+                            retVal.Add(new Team(idTeam, teamname, teamlogo, _base, teamchief, technicalchief,
+                                powerunit, carimage, countryid, worldchampionships, polepositions));
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public Country GetCountry(string codice)
+        {
+            Country retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Country WHERE countryCode='"+ codice+"';";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string IsoCode = reader.GetString(0);
+                            string descr = reader.GetString(1);
+                            retVal = new Country(IsoCode, descr);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public Driver GetDriver(int n)
+        {
+            Driver retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Driver WHERE Number='" + n + "';";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+                            int number = reader.GetInt32(1);
+                            string name = reader.GetString(2);
+                            DateTime dob = reader.GetDateTime(3);
+                            byte[] helmetImage = reader["HelmetImage"] as byte[];
+                            byte[] image = reader["Image"] as byte[];
+                            int teamId = reader.GetInt32(6);
+                            int podius = reader.GetInt32(7);
+                            retVal = new Driver(id, number,name,dob,helmetImage,image,teamId,podius);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public Team GetTeam(int id)
+        {
+            Team retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Team WHERE ID='" + id + "';";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int idTeam = reader.GetInt32(0);
+                            string teamname = reader.GetString(1);
+                            byte[] teamlogo = reader["TeamLogo"] as byte[];
+                            string _base = reader.GetString(3);
+                            string teamchief = reader.GetString(4);
+                            string technicalchief = reader.GetString(5);
+                            string powerunit = reader.GetString(6);
+                            byte[] carimage = reader["CarImage"] as byte[];
+                            string countryid = reader.GetString(8);
+                            int worldchampionships = reader.GetInt32(9);
+                            int polepositions = reader.GetInt32(10);
+                            retVal = new Team(idTeam, teamname, teamlogo, _base, teamchief, technicalchief,
+                                powerunit, carimage, countryid, worldchampionships, polepositions);
                         }
                     }
                 }
@@ -290,6 +495,15 @@ namespace FormulaOneDLL
             da.Fill(dataTable);
             conn.Close();
             da.Dispose();
+        }
+
+        public static Image ByteArrayToImage(byte[] byteArrayIn)
+        {
+            using (MemoryStream ms = new MemoryStream(byteArrayIn))
+            {
+                Image returnImage = Image.FromStream(ms);
+                return returnImage;
+            }
         }
     }
 }

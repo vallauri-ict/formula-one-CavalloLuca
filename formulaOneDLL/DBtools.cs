@@ -19,8 +19,38 @@ namespace FormulaOneDLL
         public const string DBPATH = @"C:\data\formulaone\";
         public const string CONNECTION_STRING = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename="+ DBPATH + "formulaone.mdf;Integrated Security=True";
 
+        public IEnumerable<TeamDtO> GetTeamsList()
+        {
+            List<string> drivers = new List<string>();
+            List<TeamDtO> retVal = new List<TeamDtO>();
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                Console.WriteLine("\nQuery data example: ");
+                Console.WriteLine("\n=========================================\n");
+                String sql = "SELECT d.TeamId,t.TeamName,t.TeamLogo,d.Name,t.CarImage FROM Driver d, Team t WHERE d.TeamId=t.ID GROUP BY d.TeamId;";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string name = reader.GetString(1);
+                            byte[] tl=reader["Image"] as byte[];
+                            drivers.Add(reader.GetString(3));
+                            byte[] ci = reader["Image"] as byte[];
+                            retVal.Add(new TeamDtO(name, tl, drivers.ToArray(), ci));
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
 
         private DataTable dataTable = new DataTable();
+
+        #region Country
 
         public List<string> GetCountries()
         {
@@ -48,6 +78,58 @@ namespace FormulaOneDLL
             return retVal;
         }
 
+        public List<Country> GetCountriesObj()
+        {
+            List<Country> retVal = new List<Country>();
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Country";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string IsoCode = reader.GetString(0);
+                            string descr = reader.GetString(1);
+                            retVal.Add(new Country(IsoCode, descr));
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public Country GetCountry(string codice)
+        {
+            Country retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Country WHERE countryCode='" + codice + "';";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string IsoCode = reader.GetString(0);
+                            string descr = reader.GetString(1);
+                            retVal = new Country(IsoCode, descr);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        #endregion
+
+        #region Driver
+
         public List<string> GetDrivers()
         {
             List<string> retVal = new List<string>();
@@ -68,30 +150,6 @@ namespace FormulaOneDLL
                             int number = reader.GetInt32(1);
                             string name = reader.GetString(2);
                             retVal.Add(id + " - " + number + " - " + name);
-                        }
-                    }
-                }
-            }
-            return retVal;
-        }
-
-        public List<Country> GetCountriesObj()
-        {
-            List<Country> retVal = new List<Country>();
-            using (SqlConnection dbConn = new SqlConnection())
-            {
-                dbConn.ConnectionString = CONNECTION_STRING;
-                String sql = "SELECT * FROM Country";
-                using (SqlCommand command = new SqlCommand(sql, dbConn))
-                {
-                    dbConn.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            string IsoCode = reader.GetString(0);
-                            string descr = reader.GetString(1);
-                            retVal.Add(new Country(IsoCode,descr));
                         }
                     }
                 }
@@ -129,6 +187,70 @@ namespace FormulaOneDLL
             return retVal;
         }
 
+        public Driver GetDriver_number(int n)
+        {
+            Driver retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Driver WHERE Number='" + n + "';";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+                            int number = reader.GetInt32(1);
+                            string name = reader.GetString(2);
+                            DateTime dob = reader.GetDateTime(3);
+                            byte[] helmetImage = reader["HelmetImage"] as byte[];
+                            byte[] image = reader["Image"] as byte[];
+                            int teamId = reader.GetInt32(6);
+                            int podiums = reader.GetInt32(7);
+                            retVal = new Driver(id, number, name, dob, helmetImage, image, teamId, podiums);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public Driver GetDriver_name(string driverName)
+        {
+            Driver retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Driver WHERE Name='" + driverName + "';";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+                            int number = reader.GetInt32(1);
+                            string name = reader.GetString(2);
+                            DateTime dob = reader.GetDateTime(3);
+                            byte[] helmetImage = reader["HelmetImage"] as byte[];
+                            byte[] image = reader["Image"] as byte[];
+                            int teamId = reader.GetInt32(6);
+                            int podiums = reader.GetInt32(7);
+                            retVal = new Driver(id, number, name, dob, helmetImage, image, teamId, podiums);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        #endregion
+
+        #region Team
+
         public List<Team> GetTeamsObj()
         {
             List<Team> retVal = new List<Team>();
@@ -163,60 +285,6 @@ namespace FormulaOneDLL
             return retVal;
         }
 
-        public Country GetCountry(string codice)
-        {
-            Country retVal = null;
-            using (SqlConnection dbConn = new SqlConnection())
-            {
-                dbConn.ConnectionString = CONNECTION_STRING;
-                String sql = "SELECT * FROM Country WHERE countryCode='"+ codice+"';";
-                using (SqlCommand command = new SqlCommand(sql, dbConn))
-                {
-                    dbConn.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            string IsoCode = reader.GetString(0);
-                            string descr = reader.GetString(1);
-                            retVal = new Country(IsoCode, descr);
-                        }
-                    }
-                }
-            }
-            return retVal;
-        }
-
-        public Driver GetDriver(int n)
-        {
-            Driver retVal = null;
-            using (SqlConnection dbConn = new SqlConnection())
-            {
-                dbConn.ConnectionString = CONNECTION_STRING;
-                String sql = "SELECT * FROM Driver WHERE Number='" + n + "';";
-                using (SqlCommand command = new SqlCommand(sql, dbConn))
-                {
-                    dbConn.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int id = reader.GetInt32(0);
-                            int number = reader.GetInt32(1);
-                            string name = reader.GetString(2);
-                            DateTime dob = reader.GetDateTime(3);
-                            byte[] helmetImage = reader["HelmetImage"] as byte[];
-                            byte[] image = reader["Image"] as byte[];
-                            int teamId = reader.GetInt32(6);
-                            int podius = reader.GetInt32(7);
-                            retVal = new Driver(id, number,name,dob,helmetImage,image,teamId,podius);
-                        }
-                    }
-                }
-            }
-            return retVal;
-        }
-
         public Team GetTeam(int id)
         {
             Team retVal = null;
@@ -244,6 +312,105 @@ namespace FormulaOneDLL
                             int polepositions = reader.GetInt32(10);
                             retVal = new Team(idTeam, teamname, teamlogo, _base, teamchief, technicalchief,
                                 powerunit, carimage, countryid, worldchampionships, polepositions);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public Team GetTeam_teamname(string tn)
+        {
+            Team retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Team WHERE TeamName='" + tn + "';";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int idTeam = reader.GetInt32(0);
+                            string teamname = reader.GetString(1);
+                            byte[] teamlogo = reader["TeamLogo"] as byte[];
+                            string _base = reader.GetString(3);
+                            string teamchief = reader.GetString(4);
+                            string technicalchief = reader.GetString(5);
+                            string powerunit = reader.GetString(6);
+                            byte[] carimage = reader["CarImage"] as byte[];
+                            string countryid = reader.GetString(8);
+                            int worldchampionships = reader.GetInt32(9);
+                            int polepositions = reader.GetInt32(10);
+                            retVal = new Team(idTeam, teamname, teamlogo, _base, teamchief, technicalchief,
+                                powerunit, carimage, countryid, worldchampionships, polepositions);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public Team GetTeam_id(int id)
+        {
+            Team retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                String sql = "SELECT * FROM Team WHERE Id='" + id + "';";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int idTeam = reader.GetInt32(0);
+                            string teamname = reader.GetString(1);
+                            byte[] teamlogo = reader["TeamLogo"] as byte[];
+                            string _base = reader.GetString(3);
+                            string teamchief = reader.GetString(4);
+                            string technicalchief = reader.GetString(5);
+                            string powerunit = reader.GetString(6);
+                            byte[] carimage = reader["CarImage"] as byte[];
+                            string countryid = reader.GetString(8);
+                            int worldchampionships = reader.GetInt32(9);
+                            int polepositions = reader.GetInt32(10);
+                            retVal = new Team(idTeam, teamname, teamlogo, _base, teamchief, technicalchief,
+                                powerunit, carimage, countryid, worldchampionships, polepositions);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        #endregion
+
+        public List<DriverDtO> GetDriversList()
+        {
+            List<DriverDtO> retVal = new List<DriverDtO>();
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                Console.WriteLine("\nQuery data example: ");
+                Console.WriteLine("\n=========================================\n");
+                String sql = "SELECT d.Number,d.Name,d.Image,t.TeamName,c.CountryCode FROM Driver d, Team t, Country c WHERE d.TeamId=t.ID AND t.CountryId=c.CountryCode;";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int number = reader.GetInt32(0);
+                            string name = reader.GetString(1);
+                            byte[] image = reader["Image"] as byte[];
+                            string tn = reader.GetString(3);
+                            string cc = reader.GetString(4);
+                            retVal.Add(new DriverDtO(number, name, image, tn, cc));
                         }
                     }
                 }

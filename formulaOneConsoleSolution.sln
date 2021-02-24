@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaOneWebForm", "Formul
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "todoApi", "todoApi\todoApi.csproj", "{EB1BC27D-4CAA-44D5-8918-3D2B0E34EDE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "formulaOneWebServices", "formulaOneWebServices\formulaOneWebServices.csproj", "{7EE887B5-083F-4372-9F0B-E5787C318374}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "formulaOneWebServices", "formulaOneWebServices\formulaOneWebServices.csproj", "{7EE887B5-083F-4372-9F0B-E5787C318374}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

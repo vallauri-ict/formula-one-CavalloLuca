@@ -20,12 +20,26 @@ namespace formulaOneWebServices
             return db.GetDriversObj();
         }
 
-        // GET: api/Driver/10
-        [HttpGet("{number}", Name = "GetDriver")]
-        public Driver Get(int number)
+        /*// GET: api/Driver/10
+        [HttpGet("{number}")]
+        public Driver GetNumber(int number)
         {
             DBtools db = new DBtools();
             return db.GetDriver(number);
+        }*/
+
+        [HttpGet("number/{number}")] // GET /api/driver/number/10
+        public Driver GetDriverFromNumber(int number)
+        {
+            DBtools d = new DBtools();
+            return d.GetDriver_number(number);
+        }
+
+        [HttpGet("name/{name}")] // GET /api/driver/name/Lewis Hamilton
+        public Driver GetDriverFromName(string name)
+        {
+            DBtools d = new DBtools();
+            return d.GetDriver_name(name);
         }
 
         // POST: api/Driver

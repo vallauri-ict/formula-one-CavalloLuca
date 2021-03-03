@@ -13,6 +13,7 @@ namespace FormulaOneDLL
             Image = image;
             TeamName = teamName;
             CountryCode = countryCode;
+
         }
 
         public int Number { get; set; }
@@ -20,5 +21,13 @@ namespace FormulaOneDLL
         public byte[] Image { get; set; }
         public string TeamName { get; set; }
         public string CountryCode { get; set; }
+
+        public string CountryFlag 
+        { 
+            get 
+            {
+                return String.Format("https://www.countryflags.io/{0}/flat/64.png", CountryCode.ToLower());
+            } 
+        }
     }
 }

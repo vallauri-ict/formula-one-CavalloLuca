@@ -19,5 +19,12 @@ namespace formulaOneWebServices
             return d.GetDriversList();
         }
 
+        [HttpGet("number/{number}")] // GET /api/DCDtO/number/10
+        public DriverDtOSpecifics GetDriverSpecifics(int number)
+        {
+            DBtools d = new DBtools();
+            return d.GetDriverSpecifics(number);
+        }
+
     }
 }

@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DriverDtOSpecifics.cs" />
     <Compile Include="TeamDtO.cs" />
     <Compile Include="DriverDtO.cs" />
     <Compile Include="Country.cs" />

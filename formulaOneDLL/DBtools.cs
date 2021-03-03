@@ -21,14 +21,53 @@ namespace FormulaOneDLL
 
         public IEnumerable<TeamDtO> GetTeamsList()
         {
-            List<string> drivers = new List<string>();
             List<TeamDtO> retVal = new List<TeamDtO>();
+            string tName = "";
+            byte[] tLogo = new byte[0];
+            string[] dNames = new string[2];
+            List<byte[]> dImages = new List<byte[]>();
+            byte[] carImage = new byte[0];
             using (SqlConnection dbConn = new SqlConnection())
             {
                 dbConn.ConnectionString = CONNECTION_STRING;
-                Console.WriteLine("\nQuery data example: ");
-                Console.WriteLine("\n=========================================\n");
-                String sql = "SELECT d.TeamId,t.TeamName,t.TeamLogo,d.Name,t.CarImage FROM Driver d, Team t WHERE d.TeamId=t.ID GROUP BY d.TeamId;";
+                dbConn.Open();
+                string sql = "SELECT t.TeamName, t.TeamLogo, d.Name, d.Image, t.CarImage FROM Team t, Driver d WHERE d.TeamID = t.ID ORDER BY t.TeamName";
+                SqlCommand cmd = new SqlCommand(sql, dbConn);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                int i = 0;
+                while (reader.Read())
+                {
+                    if (i % 2 == 0)
+                    {
+                        tName = reader.GetString(0);
+                        tLogo = reader["TeamLogo"] as byte[];
+                        dNames = new string[2];
+                        dNames[0] = reader.GetString(2);
+                        dImages = new List<byte[]>();
+                        dImages.Add(reader["Image"] as byte[]);
+                        carImage = reader["CarImage"] as byte[];
+                    }
+                    else
+                    {
+                        dNames[1] = reader.GetString(2);
+                        dImages.Add(reader["Image"] as byte[]);
+                        TeamDtO team = new TeamDtO(tName, tLogo, dNames, dImages, carImage);
+                        retVal.Add(team);
+                    }
+                    i++;
+                }
+            }
+            return retVal;
+        }
+
+        public DriverDtOSpecifics GetDriverSpecifics(int n)
+        {
+            DriverDtOSpecifics retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                string sql = "SELECT d.Number,d.Name,d.Image,t.TeamName,c.countryCode,d.Podiums,d.DOB FROM Driver d,Team t,Country c WHERE d.TeamID=t.ID AND d.CountryCode=c.countryCode AND d.Number='" + n + "';";
                 using (SqlCommand command = new SqlCommand(sql, dbConn))
                 {
                     dbConn.Open();
@@ -36,11 +75,14 @@ namespace FormulaOneDLL
                     {
                         while (reader.Read())
                         {
+                            int number = reader.GetInt32(0);
                             string name = reader.GetString(1);
-                            byte[] tl=reader["Image"] as byte[];
-                            drivers.Add(reader.GetString(3));
-                            byte[] ci = reader["Image"] as byte[];
-                            retVal.Add(new TeamDtO(name, tl, drivers.ToArray(), ci));
+                            byte[] img = reader["Image"] as byte[];
+                            string tn = reader.GetString(3);
+                            string cc = reader.GetString(4);
+                            int podiums = reader.GetInt32(5);
+                            DateTime dob = reader.GetDateTime(6);
+                            retVal = new DriverDtOSpecifics(number, name, img, tn, cc, podiums, dob);
                         }
                     }
                 }

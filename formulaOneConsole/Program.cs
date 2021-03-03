@@ -26,6 +26,10 @@ namespace FormulaOneConsole
                 Console.WriteLine("1 - Create Countries");
                 Console.WriteLine("2 - Create Teams");
                 Console.WriteLine("3 - Create Drivers");
+                Console.WriteLine("4 - Create Circuits");
+                Console.WriteLine("5 - Create Races");
+                Console.WriteLine("6 - Create RacesPoints");
+                Console.WriteLine("7 - Create Scorse");
                 Console.WriteLine("------------------");
                 Console.WriteLine("B - Backup");
                 Console.WriteLine("T - Restore");
@@ -43,6 +47,18 @@ namespace FormulaOneConsole
                         break;
                     case '3':
                         DBTools.ExecuteSqlScript("Drivers.sql");
+                        break;
+                    case '4':
+                        DBTools.ExecuteSqlScript("Circuits.sql");
+                        break;
+                    case '5':
+                        DBTools.ExecuteSqlScript("Races.sql");
+                        break;
+                    case '6':
+                        DBTools.ExecuteSqlScript("RacesPoints.sql");
+                        break;
+                    case '7':
+                        DBTools.ExecuteSqlScript("Scores.sql");
                         break;
                     case 'B':
                         Thread.Sleep(1050);

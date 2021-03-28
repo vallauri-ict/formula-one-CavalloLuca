@@ -1,7 +1,9 @@
 ﻿using FormulaOneDLL;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -26,15 +28,16 @@ namespace FormulaOneWebForm
                 dgvItems.DataSource = db.getTable(cmbTables.SelectedItem.ToString());
                 dgvItems.DataBind();
             }
-            /*else
+            else
             {
                 // elaborazioni da eseguire tutte le volte che la pagina viene ricaricata
                 // lblMessaggio.Text = "Benvenuto al signor " + txtUserName.Text;
                 // riempire la lista nazioni
-                DBtools db=new DBtools();
-                dgvItems.DataSource = db.getTable(cmbTables.SelectedIndex.ToString());
-                dgvItems.DataBind();
-            }*/
+                //DBtools db=new DBtools();
+                //dgvItems.DataSource = db.getTable(cmbTables.SelectedIndex.ToString());
+                //dgvItems.DataBind();
+                Getcountry("");
+            }
         }
 
         protected void changeSelection(object sender, EventArgs e)
@@ -42,6 +45,28 @@ namespace FormulaOneWebForm
             DBtools db = new DBtools();
             dgvItems.DataSource = db.caricaTables(cmbTables.SelectedItem.ToString());
             dgvItems.DataBind();
+        }
+
+        public void Getcountry(string isoCode="")
+        {
+            HttpWebRequest apiRequest = WebRequest.Create("http://localhost:44308/api/Country/" + isoCode + "") as HttpWebRequest;
+            string apiResponse = "";
+            try
+            {
+                using (HttpWebResponse response = apiRequest.GetResponse() as HttpWebResponse)
+                {
+                    StreamReader reader = new StreamReader(response.GetResponseStream());
+                    apiResponse = reader.ReadToEnd();
+                    Country[] oCountry = Newtonsoft.Json.JsonConvert.DeserializeObject<Country[]>(apiResponse);
+                    lblNazioni.DataSource = oCountry;
+                    lblNazioni.DataBind();
+                    lblNazioni.Visible = true;
+                }
+            }
+            catch(System.Net.WebException ex)
+            {
+                Console.Write(ex.Message);
+            }
         }
     }
 }

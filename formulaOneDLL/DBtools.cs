@@ -61,7 +61,7 @@ namespace FormulaOneDLL
             return retVal;
         }
 
-        public DriverDtOSpecifics GetDriverSpecifics(int n)
+        public TeamDtOSpecifics GetTeamSpecifics(int id)
         {
             DriverDtOSpecifics retVal = null;
             using (SqlConnection dbConn = new SqlConnection())
@@ -289,6 +289,64 @@ namespace FormulaOneDLL
             return retVal;
         }
 
+        public List<DriverDtO> GetDriversList()
+        {
+            List<DriverDtO> retVal = new List<DriverDtO>();
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                Console.WriteLine("\nQuery data example: ");
+                Console.WriteLine("\n=========================================\n");
+                String sql = "SELECT d.Number,d.Name,d.Image,t.TeamName,c.CountryCode FROM Driver d, Team t, Country c WHERE d.TeamId=t.ID AND t.CountryId=c.CountryCode;";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int number = reader.GetInt32(0);
+                            string name = reader.GetString(1);
+                            byte[] image = reader["Image"] as byte[];
+                            string tn = reader.GetString(3);
+                            string cc = reader.GetString(4);
+                            retVal.Add(new DriverDtO(number, name, image, tn, cc));
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        public DriverDtOSpecifics GetDriverSpecifics(int n)
+        {
+            DriverDtOSpecifics retVal = null;
+            using (SqlConnection dbConn = new SqlConnection())
+            {
+                dbConn.ConnectionString = CONNECTION_STRING;
+                string sql = "SELECT d.Number,d.Name,d.Image,t.TeamName,c.countryCode,d.Podiums,d.DOB FROM Driver d,Team t,Country c WHERE d.TeamID=t.ID AND d.CountryCode=c.countryCode AND d.Number='" + n + "';";
+                using (SqlCommand command = new SqlCommand(sql, dbConn))
+                {
+                    dbConn.Open();
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int number = reader.GetInt32(0);
+                            string name = reader.GetString(1);
+                            byte[] img = reader["Image"] as byte[];
+                            string tn = reader.GetString(3);
+                            string cc = reader.GetString(4);
+                            int podiums = reader.GetInt32(5);
+                            DateTime dob = reader.GetDateTime(6);
+                            retVal = new DriverDtOSpecifics(number, name, img, tn, cc, podiums, dob);
+                        }
+                    }
+                }
+            }
+            return retVal;
+        }
+
         #endregion
 
         #region Team
@@ -431,34 +489,7 @@ namespace FormulaOneDLL
 
         #endregion
 
-        public List<DriverDtO> GetDriversList()
-        {
-            List<DriverDtO> retVal = new List<DriverDtO>();
-            using (SqlConnection dbConn = new SqlConnection())
-            {
-                dbConn.ConnectionString = CONNECTION_STRING;
-                Console.WriteLine("\nQuery data example: ");
-                Console.WriteLine("\n=========================================\n");
-                String sql = "SELECT d.Number,d.Name,d.Image,t.TeamName,c.CountryCode FROM Driver d, Team t, Country c WHERE d.TeamId=t.ID AND t.CountryId=c.CountryCode;";
-                using (SqlCommand command = new SqlCommand(sql, dbConn))
-                {
-                    dbConn.Open();
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int number = reader.GetInt32(0);
-                            string name = reader.GetString(1);
-                            byte[] image = reader["Image"] as byte[];
-                            string tn = reader.GetString(3);
-                            string cc = reader.GetString(4);
-                            retVal.Add(new DriverDtO(number, name, image, tn, cc));
-                        }
-                    }
-                }
-            }
-            return retVal;
-        }
+        
 
         public object caricaTables(string tablename)
         {

@@ -46,9 +46,9 @@ namespace formulaOneWebServices
                     await context.Response.WriteAsync("- TEAM:\n");
                     await context.Response.WriteAsync("8) /api/team\n");
                     await context.Response.WriteAsync("9) /api/team/id/1\n");
-                    await context.Response.WriteAsync("10) /api/team/teamname/Mercedes-AMG Petronas F1 Team\n\n");
+                    await context.Response.WriteAsync("10) /api/team/teamname/Mercedes-AMG Petronas F1 Team\n");
                     await context.Response.WriteAsync("11) /api/TCDtO\n");
-                    await context.Response.WriteAsync("11) /api/TCDtO//teamname/Mercedes-AMG Petronas F1 Team\n");
+                    await context.Response.WriteAsync("12) /api/TCDtO/teamname/Mercedes-AMG Petronas F1 Team\n");
                     await context.Response.WriteAsync("----------------------------\n\n");
                     await context.Response.WriteAsync("1) Restituisce tutti i record della tabella country\n");
                     await context.Response.WriteAsync("2) Restituisce il record della tabella country corrispondente al parametro CountryCode\n");

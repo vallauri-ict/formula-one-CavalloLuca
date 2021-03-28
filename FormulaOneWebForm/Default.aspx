@@ -23,6 +23,10 @@
         <div>
             <asp:DataGrid ID="dgvItems" runat="server"></asp:DataGrid>
         </div>
+        <br />
+        <div>
+            <asp:DataGrid ID="lblNazioni" runat="server"></asp:DataGrid>
+        </div>
     </form>
 </body>
 </html>

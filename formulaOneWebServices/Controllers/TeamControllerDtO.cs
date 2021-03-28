@@ -19,5 +19,12 @@ namespace formulaOneWebServices
             return d.GetTeamsList();
         }
 
+        [HttpGet("id/{id}")] // GET /api/TCDtO/id/1
+        public TeamDtOSpecifics GetTeamSpecifics(int id)
+        {
+            DBtools d = new DBtools();
+            return d.GetTeamSpecifics(id);
+        }
+
     }
 }
